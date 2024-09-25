@@ -1,0 +1,23 @@
+<div class="sticky-top">
+  <header class="navbar navbar-dark bg-dark custom-dark d-flex flex-wrap justify-content-between py-3 mb-4 border-bottom">
+    <a href="/" class="d-flex align-items-center mb-md-0 me-md-auto text-white text-decoration-none">
+      <span class="fw-bold fs-4 ms-3">Diary Routine V2</span>
+    </a>
+
+    <ul class="nav nav-pills tab-content dropdown-nav me-3" role="tabpanel">
+      <li class="nav-item tab-pane active" role="tabpanel">
+        <div class="dropdown">
+          <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">Menu</button>
+
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+            <%- include('navbar-li') %>
+          </ul>
+        </div>
+      </li>
+    </ul>
+
+    <ul class="nav nav-pills tab-content long-nav me-3" role="tabpanel">
+      <%- include('navbar-li') %>
+    </ul>
+  </header>
+</div>

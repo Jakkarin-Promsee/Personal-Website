@@ -1,0 +1,18 @@
+<li class=" nav-item tab-pane active">
+  <a href="/" class="nav-link text-white <%= (active == 1) ? "active" : "" %>">Home</a>
+</li>
+<li class="nav-item tab-pane active">
+  <a href="/to-do-list" class="nav-link text-white <%= (active == 2) ? "active" : "" %>">To do list</a>
+</li>
+<li class="nav-item tab-pane active">
+  <a href="#" class="nav-link text-white <%= (active == 3) ? "active" : "" %>">Fussy list</a>
+</li>
+<li class="nav-item tab-pane active">
+  <a href="#" class="nav-link text-white <%= (active == 4) ? "active" : "" %>">Morning Diary</a>
+</li>
+<div class="dropdown-divider"></div>
+<li class="nav-item tab-pane d-flex <%= locals.buttonInformation? "active" : "fade" %>">
+  <a href="<%= buttonInformation.log_link %>" class="btn btn-outline-light w-100 d-flex justify-content-center align-items-center <%= (active == 0) ? "active" : "" %>">
+    <%= buttonInformation.log %>
+  </a>
+</li>

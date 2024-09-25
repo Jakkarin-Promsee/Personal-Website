@@ -1,0 +1,16 @@
+.custom-dark {
+    background-color: #111 !important;
+    /* Or any darker shade */
+}
+
+@media (max-width: 720px) {
+    .long-nav {
+        display: none;
+    }
+}
+
+@media (min-width: 720px) {
+    .dropdown-nav {
+        display: none;
+    }
+}

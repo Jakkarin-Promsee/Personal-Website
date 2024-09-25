@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <!-- Bootstrap CSS -->
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <script src="/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS -->
+  <!-- Custom styles for this template -->
+  <link href="/home/navbar.css" rel="stylesheet">
+  <link rel="stylesheet" href="/to-do-list.css">
+</head>
+
+<body>
+  <%- include('assets/navbar') %>
+
+  <div class="px-1 px-md-2  my-3">
+    <div class="d-flex align-self-center align-items-center mb-2 ps-0 ps-md-3 ps-lg-5 ">
+      <h1 class="display-3 fs-2 fw-bold text-body-emphasis pt-2 pe-2">TODO LIST #19/09/2023</h1>
+
+      <div class="d-flex align-items-center">
+        <!-- Dropdown for Preset Days -->
+        <div class="container my-4">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+              Select a Day
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <li>
+                <!-- Header of Custom Day Button -->
+                <div class="sticky-top-custom text-center">
+                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#customDayModal">
+                    Select Custom Day
+                  </button>
+                </div>
+              </li>
+              <li><a class="dropdown-item" href="#">20/9/2023</a></li>
+              <li><a class="dropdown-item" href="#">21/9/2023</a></li>
+              <li><a class="dropdown-item" href="#">22/9/2023</a></li>
+              <li><a class="dropdown-item" href="#">23/9/2023</a></li>
+              <li><a class="dropdown-item" href="#">24/9/2023</a></li>
+              <!-- Add more days here -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- Modal for Selecting Custom Day -->
+        <div class="modal fade" id="customDayModal" tabindex="-1" aria-labelledby="customDayModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="customDayModalLabel">Select Custom Day</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form>
+                  <div class="mb-3">
+                    <label for="customDayInput" class="form-label">Choose a date:</label>
+                    <input type="date" class="form-control" id="customDayInput">
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Select</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="px-0 px-md-3 px-lg-5">
+      <table class="table mx table-bordered">
+        <thead>
+          <tr class="text-center fs-5 ">
+            <th class="table-custom-dark column-number" scope="col">#</th>
+            <th class="table-custom-dark column-checkbox" scope="col">Done?</th>
+            <th class="table-custom-dark column-plan" scope="col">Plan</th>
+            <th class="table-custom-dark column-time" scope="col">Time</th>
+            <th class="table-custom-dark column-edit" scope="col">Edit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% data.forEach((item, index) => { %>
+
+          <tr class="text-center fs-5 custom-text-content">
+            <th scope="row"><%= index + 1 %></th>
+            <td><input class="form-check-input" name="KeepLogin" type="checkbox" value="on" id="form1Example3" <%= item.done? "checked" : "" %> /></td>
+            <td><%= item.plan %></td>
+            <td><%=item.time %></td>
+            <td>
+              <div class="d-flex justify-content-between">
+                <button class="btn btn-primary btn-sm w-100 me-1 fs-6 custom-text-content" type="button">Edit</button>
+                <button class="btn btn-danger btn-sm w-100 ms-1 fs-6 custom-text-content" type="button">Delete</button>
+              </div>
+            </td>
+          </tr>
+
+          <% });%>
+
+
+          <tr class="text-center fs-5 custom-text-content">
+            <th scope="row"><%= data.length + 1 %></th>
+            <td colspan="4">
+              <div class="d-flex justify-content-between ">
+                <button class="btn btn-success btn-sm w-100 me-1 fs-6 custom-text" type="button">Add new task</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+  </div>
+
+
+</body>
+
+</html>

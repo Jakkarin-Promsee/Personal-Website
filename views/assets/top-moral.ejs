@@ -1,0 +1,36 @@
+ <!-- Modal top pop up code -->
+ <div class="modal" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-scrollable">
+     <div class="modal-content">
+       <div class="modal-header">
+         <h5 class="modal-title" id="successModalLabel"><%= (locals.popUp)? popUp.head : "" %></h5>
+         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+       </div>
+       <div class="modal-body">
+         <%= (locals.popUp)? popUp.body : "" %>
+       </div>
+       <div class="modal-footer">
+         <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <script>
+   // Modal top pop up activate
+   <% if ( locals.popUp ) { %>
+   var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+   successModal.show();
+
+   <% if ( locals.popUp.href ) { %>
+
+   // Listen for the modal closing event
+   var modalElement = document.getElementById('successModal');
+   modalElement.addEventListener('hidden.bs.modal', function() {
+     // Redirect to home page when the modal is closed
+     window.location.href = '<%= popUp.href %>';
+   });
+   <% } %>
+
+   <% } %>
+ </script>

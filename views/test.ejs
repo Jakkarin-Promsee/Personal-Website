@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Day Selector</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .sticky-top-customss {
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      /* Ensure it's above the dropdown */
+      background-color: #f8f9fa;
+      /* Sticky header background */
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header of Custom Day Button -->
+  <div class="d-flex justify-content-between text-center">
+    <button type="button" class="btn btn-success btn-sm w-100 me-1 fs-6 custom-text" data-bs-toggle="modal" data-bs-target="#addNewData">
+      Add new task
+    </button>
+  </div>
+
+  <!-- Modal for Selecting Custom Day -->
+  <div class="modal fade" id="addNewData" tabindex="-1" aria-labelledby="customDayModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="customDayModalLabel">Add New Task</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <form action="/api/addData" method="POST">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label" for="plan_detail">Plan Detail:</label>
+              <input type="text" required class="form-control" id="plan_detail">
+            </div>
+
+            <div class="input-group mb-3 d-flex justify-content-between">
+              <div class="d-flex justify-content-start">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="inputPrioritySelect">Priority:</label>
+                </div>
+                <select class="custom-select form-control" id="inputPrioritySelect">
+                  <option selected>Choose...</option>
+                  <option value="1">High</option>
+                  <option value="2">Medium</option>
+                  <option value="3">Low</option>
+                </select>
+              </div>
+
+              <div class="d-flex justify-content-end">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="inputTimeSelect">Priority:</label>
+                </div>
+                <input type="time" class="form-control" id=" inputTimeSelect">
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

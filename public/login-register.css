@@ -1,0 +1,15 @@
+.dividers {
+    flex: 1;
+    height: 1px;
+    background-color: #eee;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+}
+
+.divider p {
+    margin: 0 15px;
+    /* Add space between the lines and text */
+}

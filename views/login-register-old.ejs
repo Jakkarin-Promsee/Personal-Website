@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In</title>
+</head>
+
+<body>
+  <h1>Sign In:</h1>
+  <form id="signinForm" action="/login" method="POST">
+    <label for="username">Username:</label>
+    <input type="text" id="signin-username" name="username" required>
+
+    <label for="password">Password:</label>
+    <input type="password" id="signin-password" name="password" required>
+
+    <button type="submit">Sign In</button>
+  </form>
+
+  <h1>Register:</h1>
+  <form id="registerForm" action="/register" method="POST">
+    <label for="username">Username:</label>
+    <input type="text" id="registe-username" name="username" required>
+
+    <label for="password">Password:</label>
+    <input type="password" id="registe-password" name="password" required>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <% if (locals.message) { %>
+  <h3><%= message %></h3>
+  <% } %>
+</body>
+
+</html>

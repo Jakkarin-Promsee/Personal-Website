@@ -1,0 +1,39 @@
+.table-custom-dark {
+    background-color: #1e1e1e !important;
+    /* Or any darker shade */
+}
+
+@media (max-width: 720px) {
+    .custom-text-content {
+        font-size: 16px !important;
+        /* Adjust size as needed */
+    }
+}
+
+@media (max-width: 540px) {
+    .custom-text-content {
+        font-size: 12px !important;
+        /* Adjust size as needed */
+    }
+}
+
+.column-number {
+    width: 5%;
+    /* Adjust as needed */
+}
+
+.column-checkbox {
+    width: 10%;
+}
+
+.column-plan {
+    width: 55%;
+}
+
+.column-time {
+    width: 20%;
+}
+
+.column-edit {
+    width: 10%;
+}
