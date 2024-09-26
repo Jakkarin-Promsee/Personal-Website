@@ -1,6 +1,4 @@
-// middlewares/timeoutMiddleware.js
-
-exports.isTimeout = (req, res, next) => {
+const isTimeout = (req, res, next) => {
     if (!req.session.KeepLogin) {
         const sessionTimeout = 60 * 1000; // 60 minute test in milliseconds
         const currentTime = Date.now();
@@ -22,3 +20,7 @@ exports.isTimeout = (req, res, next) => {
     // Proceed to the next middleware or route
     next();
 };
+
+module.exports = {
+    isTimeout
+}

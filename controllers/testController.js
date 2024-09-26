@@ -1,6 +1,4 @@
-// controllers/testController.js
-
-exports.renderTestPage = (req, res) => {
+const renderTestPage = (req, res) => {
     res.render('test');
     // res.render('test', { popUp: { popUpHead: "Register Status", popUpBody: "Register successfully!" } });
 
@@ -27,4 +25,8 @@ exports.renderTestPage = (req, res) => {
     // // Call the function to insert the example data
     // insertDiaryPlan();
 
+}
+
+module.exports = {
+    renderTestPage
 }

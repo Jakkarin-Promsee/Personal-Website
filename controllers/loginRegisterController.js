@@ -1,6 +1,4 @@
-// controllers/loginRegisterController.js
-
-exports.renderLogin_RegisterController = (req, res, next) => {
+const renderLogin_RegisterController = (req, res, next) => {
     // If link path paramiter has ?register=true, Then go to page with register page first.
     const registerParam = req.query.register === 'true';
     const forceLogin = req.query.forceLogin === 'true';
@@ -25,4 +23,8 @@ exports.renderLogin_RegisterController = (req, res, next) => {
         buttonInformation: buttonInformation, // send log-in and log-out button information to client
         popUp: popUp
     });
+}
+
+module.exports = {
+    renderLogin_RegisterController
 }

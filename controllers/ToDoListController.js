@@ -1,7 +1,5 @@
-// controllers/ToDoListController.js
-
-exports.renderToDoList = (req, res) => {
-    res.render('to-do-list', {
+const renderToDoList = (req, res) => {
+    res.render('to-do-list-fetch', {
         active: 2, // highlight at to-do-list in navbar
         buttonInformation: buttonInformation, // send log-in and log-out button information to client
         data: [
@@ -10,4 +8,8 @@ exports.renderToDoList = (req, res) => {
             { done: false, plan: "Exercise at least 30 minutes", time: "16:30-17:00" }
         ]
     });
+}
+
+module.exports = {
+    renderToDoList
 }

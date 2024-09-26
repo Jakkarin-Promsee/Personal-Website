@@ -1,12 +1,9 @@
-// routes/todoRoutes.js
 const express = require('express');
 const router = express.Router();
 
-// Import middlewares function
 const { ifLoggedin, ifNotLoggedin } = require('../middlewares/authMiddleware.js');
 const { navbarFunction } = require('../middlewares/navbarMiddleware');
 
-// Import controller function
 const { renderLogin_RegisterController } = require('../controllers/loginRegisterController.js');
 const { renderForgetPassword } = require('../controllers/forgetPasswordController.js');
 // const { renderProfile } = require('../controllers/renderProfile.js');
