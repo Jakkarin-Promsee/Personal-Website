@@ -3,43 +3,57 @@ const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
 const path = require('path');
 
+// Load environment variables from .env file
+require('dotenv').config();
+
+// Connect to the database
+const connectDB = require('./config/db');
+connectDB();
+
+// Initialize Express app
 const app = express();
 
-// Middleware to parse JSON
-// To parse JSON requset body
+// Middleware
 app.use(express.json());
-// To parse form data
 app.use(express.urlencoded({ extended: true }));
-
-// Set public to another file
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set EJS as the view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Set cookie session middleware to keep users information
+// Set cookie session middleware
 app.use(cookieSession({
     name: 'session',
     keys: ['key1', 'key2'],
     maxAge: 24 * 3600 * 1000 // 1day
 }));
 
-// MongoDB connection URL
-const mongoURI = 'mongodb://0.0.0.0:27017/Diary_Routine_DB';
-
-// Connect bootstap 5
+// Connect Bootstrap 5
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'));
 
-mongoose.connect(mongoURI)
-    .then(() => console.log('MongoDB connected!'))
-    .catch(err => console.log(err));
+// Import middlewares check timeout function function
+const { isTimeout } = require('./middlewares/timeoutMiddleware');
+app.use(isTimeout);
 
 // Import the routes
-const routes = require('./routes/routes');
-app.use('/', routes);
+const indexRoutes = require('./routes/index');
+const authRoutes = require('./routes/authRoutes');
+const todoRoutes = require('./routes/todoRoutes');
+const userRoutes = require('./routes/userRoutes');
 
+// Use route files
+app.use('/', indexRoutes);          // General routes
+app.use('/auth', authRoutes);       // Authentication routes
+app.use('/todos', todoRoutes);       // To-do list routes
+app.use('/users', userRoutes);       // User profile routes
+
+// Global error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;

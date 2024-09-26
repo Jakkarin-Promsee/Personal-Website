@@ -46,7 +46,7 @@
           <div class="tab-content">
             <!-- Login Form -->
             <div class="tab-pane show <%=(locals.isLoggedIn)? ((isLoggedIn==0) ? "active" : "fade" ) : "active"%>" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
-              <form id="signinForm" action="/login" method="POST">
+              <form id="signinForm" action="/auth/login" method="POST">
                 <% if (locals.message_login) { %>
                 <div class="alert alert-danger mb-4" role="alert"><%= message_login %></div>
                 <% } %>
@@ -93,7 +93,7 @@
 
             <!-- Register Form -->
             <div class="tab-pane <%=(locals.isLoggedIn)? ((!isLoggedIn==0) ? "active" : "fade" ) : "fade"%>" id="pills-register" role="tabpanel" aria-labelledby="tab-register">
-              <form id="registerForm" action="/register" method="POST">
+              <form id="registerForm" action="/auth/register" method="POST">
                 <div class="mb-4"></div>
                 <% if (locals.message_register) { %>
                 <div class="alert alert-danger mb-4" role="alert"><%= message_register %></div>
