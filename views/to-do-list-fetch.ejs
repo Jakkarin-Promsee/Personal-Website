@@ -15,10 +15,76 @@
 
 <body>
   <%- include('assets/header') %>
+  <!-- Modal for Selecting Custom Day -->
+  <div class="modal fade" id="addNewData" tabindex="-1" aria-labelledby="customDayModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
 
+        <div class="modal-header">
+          <h5 class="modal-title" id="customDayModalLabel">Add New Task</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <form id="taskForm">
+          <div class="modal-body">
+            <!-- Date Field -->
+            <div class="mb-3">
+              <label class="form-label" for="taskDate">Date:</label>
+              <input type="date" value="2023-09-27" required class="form-control" id="taskDate">
+            </div>
+
+            <!-- Plan Detail Field -->
+            <div class="mb-3 ">
+              <label class="form-label" for="planDetail">Plan Detail:</label>
+              <input type="text" required class="form-control" id="planDetail" autocomplete="off">
+            </div>
+
+            <!-- Time Range Fields -->
+            <div class="d-flex justify-content-between mb-3">
+              <div class="w-100">
+                <label class="form-label" for="startTime">Time:</label>
+                <input type="time" class="form-control" id="startTime">
+              </div>
+              <div class="mx-1"></div>
+              <div class="w-100">
+                <label class="form-label" for="endTime">To:</label>
+                <input type="time" class="form-control" id="endTime">
+              </div>
+            </div>
+
+            <!-- Priority Select -->
+            <div class="mb-3 w-100">
+              <label class="form-label" for="inputPrioritySelect">Priority:</label>
+              <select class="custom-select form-control" id="inputPrioritySelect">
+                <option selected value="3">Choose...</option>
+                <option value="0">Q1: Urgent and important</option>
+                <option value="1">Q2: Urgent but not important</option>
+                <option value="2">Q3: Not urgent but important</option>
+                <option value="3">Q4: Neither urgent nor important</option>
+              </select>
+            </div>
+            <!-- Reward Detail Field -->
+            <div class="mb-3 ">
+              <label class="form-label" for="planDetail">Reward Detail:</label>
+              <input type="text" class="form-control" id="rewardDetail">
+            </div>
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Add</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan Table -->
   <div class="px-1 px-md-2  my-3">
     <div class="d-flex align-self-center align-items-center mb-2 ps-0 ps-md-3 ps-lg-5 ">
-      <h1 class="display-3 fs-2 fw-bold text-body-emphasis pt-2 pe-2">TODO LIST #19/09/2023</h1>
+      <h1 class="display-3 fs-2 fw-bold text-body-emphasis pt-2 pe-2">TODO LIST</h1>
 
       <div class="d-flex align-items-center">
         <!-- Dropdown for Preset Days -->
@@ -28,45 +94,9 @@
               Select a Day
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <li>
-                <!-- Header of Custom Day Button -->
-                <div class="sticky-top-custom text-center">
-                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#customDayModal">
-                    Select Custom Day
-                  </button>
-                </div>
-              </li>
               <li><a class="dropdown-item" href="#">20/9/2023</a></li>
               <li><a class="dropdown-item" href="#">21/9/2023</a></li>
-              <li><a class="dropdown-item" href="#">22/9/2023</a></li>
-              <li><a class="dropdown-item" href="#">23/9/2023</a></li>
-              <li><a class="dropdown-item" href="#">24/9/2023</a></li>
-              <!-- Add more days here -->
             </ul>
-          </div>
-        </div>
-
-        <!-- Modal for Selecting Custom Day -->
-        <div class="modal fade" id="customDayModal" tabindex="-1" aria-labelledby="customDayModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="customDayModalLabel">Select Custom Day</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <form>
-                  <div class="mb-3">
-                    <label for="customDayInput" class="form-label">Choose a date:</label>
-                    <input type="date" class="form-control" id="customDayInput">
-                  </div>
-                </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Select</button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -84,40 +114,149 @@
             <th class="table-custom-dark column-edit" scope="col">Edit</th>
           </tr>
         </thead>
-        <tbody>
-          <% data.forEach((item, index) => { %>
-
-          <tr class="text-center fs-5 custom-text-content">
-            <th scope="row"><%= index + 1 %></th>
-            <td><input class="form-check-input" name="KeepLogin" type="checkbox" value="on" id="form1Example3" <%= item.done? "checked" : "" %> /></td>
-            <td><%= item.plan %></td>
-            <td><%=item.time %></td>
-            <td>
-              <div class="d-flex justify-content-between">
-                <button class="btn btn-primary btn-sm w-100 me-1 fs-6 custom-text-content" type="button">Edit</button>
-                <button class="btn btn-danger btn-sm w-100 ms-1 fs-6 custom-text-content" type="button">Delete</button>
-              </div>
-            </td>
-          </tr>
-
-          <% });%>
-
-
-          <tr class="text-center fs-5 custom-text-content">
-            <th scope="row"><%= data.length + 1 %></th>
-            <td colspan="4">
-              <div class="d-flex justify-content-between ">
-                <button class="btn btn-success btn-sm w-100 me-1 fs-6 custom-text" type="button">Add new task</button>
-              </div>
-            </td>
-          </tr>
+        <tbody id="taskTableBody">
+          <!-- JavaScript will dynamically load tasks here -->
         </tbody>
       </table>
     </div>
 
-
   </div>
 
+  <script>
+    // Fetch and display tasks
+    async function loadTasks() {
+      try {
+        // ?date=${date}
+        date = '2023-09-27';
+        const response = await fetch(`/todos/task?date=${date}`);
+        const tasks = await response.json();
+
+        const tableBody = document.getElementById('taskTableBody');
+        tableBody.innerHTML = ''; // Clear the table
+
+        tasks.forEach((task, index) => {
+          tableBody.innerHTML += `
+            <tr class="text-center fs-5 custom-text-content">
+              <th scope="row">${index + 1}</th>
+              <td>
+                <input 
+                class="form-check-input" 
+                type="checkbox" 
+                value="on" 
+                data-id="${task._id}" 
+                ${task.done ? 'checked' : '' } 
+                onchange="checktask('${task._id}', this.checked)"
+                />
+              </td>
+              <td>${task.plan_detail}</td>
+              <td>${task.timeRange[0]? task.timeRange[0] : "-"} ${task.timeRange[1]? "-"+task.timeRange[1] : ""}</td>
+              <td>
+                <div class="d-flex justify-content-between">
+                  <button class="btn btn-primary btn-sm w-100 me-1 fs-6 custom-text-content" type="button" onclick="editTask()">Edit</button>
+                  <button class="btn btn-danger btn-sm w-100 ms-1 fs-6 custom-text-content" type="button" onclick="deleteTask()">Delete</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+
+        tableBody.innerHTML += `
+        <tr class="text-center fs-5 custom-text-content">
+          <th scope="row">${ tasks.length + 1 } </th>
+          <td colspan="4">
+             <!-- Header of Custom Day Button -->
+             <div class="d-flex justify-content-between text-center">
+               <button type="button" class="btn btn-success btn-sm w-100 me-1 fs-6 custom-text" data-bs-toggle="modal" data-bs-target="#addNewData">
+                 Add new task
+               </button>
+             </div>
+          </td>
+        </tr>
+        `
+      } catch (error) {
+        console.error('Error loading tasks:', error);
+      }
+    }
+
+    async function checktask(taskId, isDone) {
+      try {
+        const response = await fetch(`/todos/checktask`, {
+          method: 'POST', // Change to POST
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            taskId: taskId,
+            isDone: isDone
+          }), // Send the updated status
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update task');
+
+          const result = await response.json();
+          console.log(result.isDone); // Success message from the server
+          console.log(result.message); // Success message from the server
+        }
+      } catch {
+        console.error('Error updating task status:', error);
+      }
+
+    }
+
+    document.getElementById('taskForm').addEventListener('submit', async function(event) {
+      event.preventDefault(); // Prevent the default form submission
+
+      // Capture form values
+      const taskDate = document.getElementById('taskDate').value;
+      const planDetail = document.getElementById('planDetail').value;
+      const startTime = document.getElementById('startTime').value;
+      const endTime = document.getElementById('endTime').value;
+      const priority = document.getElementById('inputPrioritySelect').value;
+      const rewardDetail = document.getElementById('rewardDetail').value;
+
+      // Create the data object to send
+      const taskData = {
+        date: taskDate,
+        plan_detail: planDetail,
+        timeRange: [startTime, endTime],
+        priority: priority,
+        rewardDetail: rewardDetail
+      };
+
+      try {
+        // Send the data via a POST request to the server
+        const response = await fetch('/todos/addTask', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json', // Send as JSON
+          },
+          body: JSON.stringify(taskData), // Send the data
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log('Task added successfully:', result);
+
+          // Close the modal using Bootstrap's modal('hide') method
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addNewData'));
+          modal.hide();
+
+          document.getElementById('taskForm').reset();
+
+          loadTasks();
+
+        } else {
+          console.error('Failed to add task:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    // Load tasks when the page loads
+    document.addEventListener('DOMContentLoaded', loadTasks);
+  </script>
 
 </body>
 
