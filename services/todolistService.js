@@ -1,6 +1,33 @@
 const Diary_Plan = require('../models/DiaryPlan');
 
-const addList = async (userId, date, plan_detail, timeRange, priority, rewardDetail) => {
+// Service function to search for tasks by user and date
+const searchList = async (userId, date) => {
+    // console.log(userId, date);
+    // testing call function
+
+    try {
+        // Find all tasks for the specific user and date
+        const tasks = await Diary_Plan.find({
+            userId: userId, // Match tasks by user ID
+            date: date
+        });
+
+        return tasks;
+    } catch (error) {
+        throw new Error('Error fetching tasks');
+    }
+};
+
+const searchTaslById = async (taskId) => {
+    try {
+        const task = await Diary_Plan.findById(taskId);
+        return task;
+    } catch (err) {
+        throw new Error('Error fetching tasks');
+    }
+}
+
+const addList = async (userId, date, plan_detail, timeRange, priority, reward_detail) => {
     try {
         //const date = new Date().toISOString().split('T')[0]; // Get today's date
 
@@ -11,7 +38,7 @@ const addList = async (userId, date, plan_detail, timeRange, priority, rewardDet
             plan_detail,
             timeRange,
             priority,
-            rewardDetail,
+            reward_detail,
         });
 
         // Save to the database
@@ -32,26 +59,29 @@ const checkTask = async (taskId, isDone) => {
     }
 };
 
-// Service function to search for tasks by user and date
-const searchList = async (userId, date) => {
-    // console.log(userId, date);
-    // testing call function
-
+const deleteTask = async (taskId) => {
     try {
-        // Find all tasks for the specific user and date
-        const tasks = await Diary_Plan.find({
-            userId: userId, // Match tasks by user ID
-            date: date
-        });
-
-        return tasks;
+        const task = await Diary_Plan.deleteOne({ _id: taskId });
+        return task;
     } catch (error) {
-        throw new Error('Error fetching tasks');
+        throw new Error('Error fetching tasks')
     }
 };
+
+const updateTask = async (taskId, task) => {
+    try {
+        const newTask = await Diary_Plan.findByIdAndUpdate(taskId, task, { new: true });
+        return newTask;
+    } catch (err) {
+        throw new Error('Error fetching task')
+    }
+}
 
 module.exports = {
     searchList,
     addList,
-    checkTask
+    checkTask,
+    deleteTask,
+    searchTaslById,
+    updateTask
 }
