@@ -1,87 +1,72 @@
 const Diary_Plan = require('../models/DiaryPlan');
 
-// Service function to search for tasks by user and date
-const searchList = async (userId, date) => {
-    // console.log(userId, date);
-    // testing call function
-
+// Find all tasks for the specific user and date
+const searchTaskByDate = async (userId, date) => {
     try {
-        // Find all tasks for the specific user and date
-        const tasks = await Diary_Plan.find({
-            userId: userId, // Match tasks by user ID
+        return await Diary_Plan.find({
+            userId: userId,
             date: date
         });
-
-        return tasks;
     } catch (error) {
-        throw new Error('Error fetching tasks');
+        throw new Error('Error fetching tasks by date');
     }
 };
 
-const searchTaslById = async (taskId) => {
+// Find all tasks for the specific taskId
+const searchTaskById = async (taskId) => {
     try {
-        const task = await Diary_Plan.findById(taskId);
-        return task;
+        return await Diary_Plan.findById(taskId);
     } catch (err) {
-        throw new Error('Error fetching tasks');
+        throw new Error('Error fetching tasks by Id');
     }
 }
 
-const addList = async (userId, date, plan_detail, timeRange, priority, reward_detail) => {
-    try {
-        //const date = new Date().toISOString().split('T')[0]; // Get today's date
-
-        // Create a new Plan instance
-        const newPlan = new Diary_Plan({
-            userId,
-            date,
-            plan_detail,
-            timeRange,
-            priority,
-            reward_detail,
-        });
-
-        // Save to the database
-        const savedPlan = await newPlan.save();
-        return savedPlan; // Return the saved plan
-    } catch (error) {
-        console.error("Error saving plan:", error);
-        throw new Error('Failed to save the plan');
-    }
-};
-
+// Find all tasks by taskId and update 'done' status
 const checkTask = async (taskId, isDone) => {
     try {
-        // Update the task's done status in the database
         await Diary_Plan.findByIdAndUpdate(taskId, { done: isDone });
     } catch (error) {
         throw new Error('Error updating task status');
     }
 };
 
+const saveTask = async (userId, date, plan_detail, timeRange, priority, reward_detail) => {
+    try {
+        const newPlan = new Diary_Plan({
+            userId,
+            date,
+            plan_detail,
+            timeRange,
+            priority,
+            reward_detail
+        });
+        await newPlan.save();
+    } catch (error) {
+        throw new Error('Failed saving task status');
+    }
+};
+
 const deleteTask = async (taskId) => {
     try {
-        const task = await Diary_Plan.deleteOne({ _id: taskId });
-        return task;
+        await Diary_Plan.deleteOne({ _id: taskId });
     } catch (error) {
-        throw new Error('Error fetching tasks')
+        throw new Error('Error deleting task by Id')
     }
 };
 
 const updateTask = async (taskId, task) => {
     try {
-        const newTask = await Diary_Plan.findByIdAndUpdate(taskId, task, { new: true });
-        return newTask;
+        await Diary_Plan.findByIdAndUpdate(taskId, task, { new: true });
     } catch (err) {
-        throw new Error('Error fetching task')
+        throw new Error('Error updating task by Id')
     }
 }
 
 module.exports = {
-    searchList,
-    addList,
+    searchTaskByDate,
+    searchTaskById,
+    saveTask,
     checkTask,
     deleteTask,
-    searchTaslById,
     updateTask
 }

@@ -16,9 +16,16 @@
 <body>
   <%- include('assets/header') %>
 
-  <!-- Modal -->
-  <div class="modal fade" id="main_modal" tabindex="-1" aria-labelledby="customDayModalLabel" aria-hidden="true">
+  <!-- Main content Modal -->
+  <div class="modal fade" id="main_modal" tabindex="1" aria-labelledby="main_modal_label" aria-hidden="true">
     <div class="modal-dialog" id="main_modal_content">
+      <!-- JavaScript will dynamically render detail here -->
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div class="modal fade" id="confirm_modal" tabindex="2" aria-labelledby="confirm_modal_label" aria-hidden="true">
+    <div class="modal-dialog" id="confirm_modal_content">
       <!-- JavaScript will dynamically render detail here -->
     </div>
   </div>
@@ -64,74 +71,263 @@
   </div>
 
   <script>
-    let todayDate = '<%= locals.serveDate? serveDate: '' %>';
-    console.log(todayDate);
+    // Declare global variable to indicate date of this page. 
+    // (server send date variable, if not, set date to today date 'yy/mm/dd')
+    let todayDate = '<%= locals.serveDate? serveDate : Date().toISOString().split('T')[0] %>';
 
-    async function loadTasksByDate(date) {
+    // Declare global variable to indicate instance of main and confirm modal.
+    // --> Main modal use to recieve and send information to users such as form, edit, etc.
+    // --> Confirm modal use to comfirm users action such as delete, cancel, etc.
+    let mainModalInstance;
+    let confirmModalInstance;
+
+    // Declare global variable to control open-close modal. Use to avoid modal close by mistake.
+    // ture is defult value, mean allow to close this modal automatically.
+    let closePermission = true;
+
+    // Load tasks when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      handleLoadPage();
+      initializeModals();
+    });
+
+
+    // -------------- Once use function when lodaing page --------------
+
+    // Initialize Modal
+    function initializeModal(modalId) {
+      return new bootstrap.Modal(document.getElementById(modalId))
+    }
+
+    // Set Modal instance
+    function initializeModals() {
+      mainModalInstance = initializeModal('main_modal');
+      confirmModalInstance = initializeModal('confirm_modal');
+    }
+
+    // -------------- Fetching function --------------
+
+    async function fetchAPI(url, method = 'GET', bodyData = null) {
+      const options = {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      };
+
+      if (bodyData) {
+        options.body = JSON.stringify(bodyData);
+      }
+
       try {
-        if (!date) date = todayDate;
+        const response = await fetch(url, options);
 
-        const response = await fetch(`/todos/loadtaskbydate?date=${date}`);
-        const tasks = await response.json();
-
-        const tableBody = document.getElementById('taskTableBody');
-        tableBody.innerHTML = ''; // Clear the table
-
-        tasks.forEach((task, index) => {
-          tableBody.innerHTML += `
-            <tr class="text-center fs-5 custom-text-content">
-              <th scope="row">${index + 1}</th>
-              <td>
-                <input 
-                class="form-check-input" 
-                type="checkbox" 
-                value="on" 
-                data-id="${task._id}" 
-                ${task.done ? 'checked' : '' } 
-                onchange="checktask('${task._id}', this.checked)"
-                />
-              </td>
-              <td>${task.plan_detail}</td>
-              <td>${task.timeRange[0]? task.timeRange[0] : "-"} ${task.timeRange[1]? "-"+task.timeRange[1] : ""}</td>
-              <td>
-                <div class="d-flex justify-content-between">
-                  <button class="btn btn-primary btn-sm w-100 me-1 fs-6 custom-text-content" type="button" onclick="handleEditTask('${task._id}')">Edit</button>
-                  <button class="btn btn-danger btn-sm w-100 ms-1 fs-6 custom-text-content" type="button" onclick="handleDeleteTask('${task._id}')">Delete</button>
-                </div>
-              </td>
-            </tr>
-          `;
-        });
-
-        tableBody.innerHTML += `
-        <tr class="text-center fs-5 custom-text-content">
-          <th scope="row">${ tasks.length + 1 } </th>
-          <td colspan="4">
-             <!-- Header of Custom Day Button -->
-             <div class="d-flex justify-content-between text-center">
-               <button type="button" class="btn btn-success btn-sm w-100 me-1 fs-6 custom-text" onclick="handleAddTask()">
-                 Add new task
-               </button>
-             </div>
-          </td>
-        </tr>
-        `
-
-        const nowDate = new Date().toISOString().split('T')[0];
-        dateSelectionchoice = document.getElementById('dateChoiceBody');
-        dateSelectionchoice.innerHTML = '';
-
-        dateSelectionchoice.innerHTML += `<li><a class=" dropdown-item"><- Custom -></a></li>`
-
-        // show 10 day
-        for (let i = 0; i < 10; i++) {
-          dateSelectionchoice.innerHTML += `<li><a class="dropdown-item" href="/todos?date=${removeDay(nowDate, i)}">${removeDay(nowDate, i)}</a></li>`
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Something went wrong');
         }
 
+        return await response.json(); // Assume most responses will be JSON
       } catch (error) {
-        console.error('Error loading tasks:', error);
+        console.error(`Error during fetch on ${url}: ${error.message}`);
+        return null;
       }
     }
+
+    async function loadTasksByDate(date) {
+      return await fetchAPI(`/todos/loadtaskbydate?date=${date || todayDate}`);
+    }
+
+    async function loadTaskById(taskId) {
+      return await fetchAPI('/todos/loadtaskbyid', 'POST', {
+        taskId: taskId
+      });
+    }
+
+    async function checkTask(taskId, isDone) {
+      return await fetchAPI(`/todos/checktask`, 'POST', {
+        taskId: taskId,
+        isDone: isDone
+      });
+    };
+
+    async function addTask(task) {
+      return await fetchAPI('/todos/addTask', 'POST', {
+        date: task.date.value,
+        plan_detail: task.plan_detail.value,
+        timeRange: [task.startTime.value, task.endTime.value],
+        priority: task.priority.value,
+        reward_detail: task.reward_detail.value
+      });
+    }
+
+    async function editTask(taskId, task) {
+      return await fetchAPI('/todos/updatetask', 'POST', {
+        taskId: taskId,
+        date: task.date.value,
+        plan_detail: task.plan_detail.value,
+        timeRange: [task.startTime.value, task.endTime.value],
+        priority: task.priority.value,
+        reward_detail: task.reward_detail.value
+      });
+    }
+
+    async function deleteTask(taskId) {
+      return await fetchAPI('/todos/deletetask', 'POST', {
+        taskId: taskId
+      });
+    }
+
+
+    // -------------- handle function --------------
+
+    // Force show modal
+    function showModal(modalInstance) {
+      if (modalInstance) {
+        modalInstance.show();
+      } else initializeModal();
+    }
+
+    // Force hide modal
+    function hideModal(modalInstance) {
+      if (modalInstance) {
+        const defaultV = closePermission;
+
+        closePermission = true;
+        modalInstance.hide();
+
+        closePermission = defaultV;
+      } else initializeModal();
+    }
+
+    async function loadTable() {
+      // Load today tasks and Sent it to table
+      const tasks = await loadTasksByDate();
+
+      if (tasks) {
+        renderTaskTable(tasks);
+      } else {
+        alert('Failed to load tasks.');
+      }
+    }
+
+    async function handleLoadPage() {
+      // Set select date button
+      renderSelectDate();
+
+      // Load today tasks and Sent it to table
+      await loadTable();
+    }
+
+    function renderConfirmToQuitModal() {
+      // render the modal detail
+      renderConfirmModal();
+
+      // Set false to permission, make close modal function was prevented
+      // Link to hide function to show comfirm to quite modal
+      closePermission = false;
+      document.getElementById('main_modal').addEventListener('hide.bs.modal', function(event) {
+        // If users close the modal by don't have permistion showing the comfirm modal
+        if (!closePermission) {
+          event.preventDefault();
+          showModal(confirmModalInstance);
+        }
+      });
+
+      // When comfrim button in modal was pressed, close all modal
+      document.getElementById('confirmButton').onclick = function(event) {
+        // hide modal is force to close all modal
+        hideModal(mainModalInstance);
+        hideModal(confirmModalInstance);
+
+        // Set permission to default
+        closePermission = true;
+      };
+    }
+
+    async function handleCheckTask(taskId, checked) {
+      const response = await checkTask(taskId, checked);
+
+      if (response) {
+        await loadTable();
+      } else {
+        alert('Failed to update task status.');
+      }
+
+    }
+
+    async function handleAddTask() {
+      // Render form modal
+      renderTaskFormModal();
+      showModal(mainModalInstance)
+
+      // Render funciton to open confirm modal before quit form
+      renderConfirmToQuitModal()
+
+      // When submit, use fetch function to connect server
+      document.getElementById('taskForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const response = await addTask(this);
+
+        if (response) {
+          // Reset form
+          this.reset();
+
+          await loadTable();
+          hideModal(mainModalInstance)
+        } else {
+          alert('Failed to update task status.');
+        }
+      });
+    }
+
+    async function handleEditTask(tasktId) {
+      // Render form modal, request task from server
+      task = await loadTaskById(tasktId);
+      renderTaskFormModal(task);
+      showModal(mainModalInstance);
+
+      // Render funciton to open confirm modal before quit form
+      renderConfirmToQuitModal()
+
+      // when submit, use fetch function to connect server
+      document.getElementById('taskForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+        const response = await editTask(tasktId, this); // Call addTask and pass the event object
+
+        if (response) {
+          // Reset form
+          this.reset();
+
+          await loadTable();
+          hideModal(mainModalInstance);
+        } else {
+          alert('Failed to update task status.');
+        }
+      });
+    }
+
+    async function handleDeleteTask(taskId) {
+      // Render confirm modal
+      renderConfirmModal();
+      showModal(confirmModalInstance);
+
+      // when submit, use fetch function to connect server
+      document.getElementById('confirmButton').addEventListener('click', async function(event) {
+        event.preventDefault(); // Prevent the default form submission behavior
+
+        const response = await deleteTask(taskId)
+
+        if (response) {
+          await loadTable();
+          hideModal(confirmModalInstance);
+        } else {
+          alert('Failed to update task status.');
+        }
+      });
+    }
+
+    // -------------- render function --------------
 
     function removeDay(refDate, i) {
       const date = new Date(refDate);
@@ -139,186 +335,58 @@
       return date.toISOString().split('T')[0];
     }
 
-    async function loadTaskById(taskId) {
-      try {
-        const response = await fetch('/todos/loadtaskbyid', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            taskId: taskId,
-          }),
-        });
+    function renderSelectDate() {
+      dateSelectionchoice = document.getElementById('dateChoiceBody');
+      dateSelectionchoice.innerHTML = '';
 
-        if (response.ok) {
-          const task = await response.json();
-          return task;
-        } else {
-          throw new Error('Failed to update task');
+      const nowDate = new Date().toISOString().split('T')[0];
 
-          const result = await response.json();
-          console.log(result.isDone); // Success message from the server
-          console.log(result.message); // Success message from the server
-        }
+      dateSelectionchoice.innerHTML += `<li><a class=" dropdown-item">
+          <- Custom ->
+        </a></li>`
 
-      } catch {
-        console.error('Error updating task status:', error);
+      // show 10 day
+      for (let i = 0; i < 10; i++) {
+        dateSelectionchoice.innerHTML += `<li><a class="dropdown-item" href="/todos?date=${removeDay(nowDate, i)}">${removeDay(nowDate, i)}</a></li>`
       }
     }
 
-    async function checktask(taskId, isDone) {
-      try {
-        const response = await fetch(`/todos/checktask`, {
-          method: 'POST', // Change to POST
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            taskId: taskId,
-            isDone: isDone
-          }), // Send the updated status
-        });
+    function renderTaskTable(tasks) {
+      const tableBody = document.getElementById('taskTableBody');
+      tableBody.innerHTML = ''; // Clear the table
 
-        if (!response.ok) {
-          throw new Error('Failed to update task');
-
-          const result = await response.json();
-          console.log(result.isDone); // Success message from the server
-          console.log(result.message); // Success message from the server
-        }
-      } catch {
-        console.error('Error updating task status:', error);
-      }
-    };
-
-    async function addTask(task) {
-      const taskData = {
-        date: task.date.value,
-        plan_detail: task.plan_detail.value,
-        timeRange: [task.startTime.value, task.endTime.value],
-        priority: task.priority.value,
-        reward_detail: task.reward_detail.value
-      }
-
-      try {
-        // Send the data via a POST request to the server
-        const response = await fetch('/todos/addTask', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json', // Send as JSON
-          },
-          body: JSON.stringify(taskData), // Send the data
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          console.log('Task added successfully:', result);
-
-
-          document.getElementById('taskForm').reset();
-
-          loadTasksByDate();
-          closeModal();
-
-        } else {
-          console.error('Failed to add task:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-      }
-    }
-
-    function handleAddTask() {
-      renderTaskFormModal();
-
-      // Add task with event listener
-      document.getElementById('taskForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission behavior
-        addTask(this); // Call addTask and pass the event object
+      tasks.forEach((task, index) => {
+        tableBody.innerHTML += `
+      <tr class="text-center fs-5 custom-text-content">
+        <th scope="row">${index + 1}</th>
+        <td>
+          <input class="form-check-input" type="checkbox" value="on" data-id="${task._id}" ${task.done ? 'checked' : '' } onchange="handleCheckTask('${task._id}', this.checked)" />
+        </td>
+        <td>${task.plan_detail}</td>
+        <td>${task.timeRange[0]? task.timeRange[0] : "-"} ${task.timeRange[1]? "- "+task.timeRange[1] : ""}</td>
+        <td>
+          <div class="d-flex justify-content-between">
+            <button class="btn btn-primary btn-sm w-100 me-1 fs-6 custom-text-content" type="button" onclick="handleEditTask('${task._id}')">Edit</button>
+            <button class="btn btn-danger btn-sm w-100 ms-1 fs-6 custom-text-content" type="button" onclick="handleDeleteTask('${task._id}')">Delete</button>
+          </div>
+        </td>
+      </tr>
+      `;
       });
 
-      openModal();
-    }
-
-    async function handleEditTask(tasktId) {
-      task = await loadTaskById(tasktId);
-      renderTaskFormModal(task);
-
-      // Add task with event listener
-      document.getElementById('taskForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission behavior
-        editTask(tasktId, this); // Call addTask and pass the event object
-      });
-
-      openModal();
-    }
-
-    async function editTask(taskId, task) {
-      const taskData = {
-        taskId: taskId,
-        date: task.date.value,
-        plan_detail: task.plan_detail.value,
-        timeRange: [task.startTime.value, task.endTime.value],
-        priority: task.priority.value,
-        reward_detail: task.reward_detail.value
-      }
-
-      try {
-        const response = await fetch('/todos/updatetask', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json', // Send as JSON
-          },
-          body: JSON.stringify(taskData)
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          console.log('Task added successfully:', result);
-
-          document.getElementById('taskForm').reset();
-          loadTasksByDate();
-          closeModal();
-
-        } else {
-          console.error('Failed to add task:', response.statusText);
-        }
-
-      } catch (error) {
-        console.error('Error:', err);
-      }
-    }
-
-    function handleDeleteTask(taskId) {
-      renderConfirmModal(taskId);
-
-      // delete task with event listener
-      document.getElementById('confirmDeleteButton').addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the default form submission behavior
-        deleteTask(taskId); // Call addTask and pass the event object
-      });
-
-      openModal();
-    }
-
-    let modalInstance;
-
-    function initializeModal() {
-      const modalElement = document.getElementById('main_modal');
-      modalInstance = new bootstrap.Modal(modalElement); // Initialize once
-    }
-
-    function openModal() {
-      if (modalInstance) {
-        modalInstance.show(); // Reuse the initialized modal instance
-      } else initializeModal();
-    }
-
-    function closeModal() {
-      if (modalInstance) {
-        modalInstance.hide(); // Reuse the initialized modal instance
-      } else initializeModal();
+      tableBody.innerHTML += `
+      <tr class="text-center fs-5 custom-text-content">
+        <th scope="row">${ tasks.length + 1 } </th>
+        <td colspan="4">
+          <!-- Header of Custom Day Button -->
+          <div class="d-flex justify-content-between text-center">
+            <button type="button" class="btn btn-success btn-sm w-100 me-1 fs-6 custom-text" onclick="handleAddTask()">
+              Add new task
+            </button>
+          </div>
+        </td>
+      </tr>
+      `
     }
 
     function renderTaskFormModal(modalPropoties) {
@@ -326,8 +394,6 @@
       modal.innerHTML = "";
 
       if (!modalPropoties) modalPropoties = {};
-      console.log(modalPropoties);
-      console.log(modalPropoties.priority == 1);
 
       modal.innerHTML = `
         <div class="modal-content">
@@ -393,58 +459,28 @@
       `
     }
 
-    function renderConfirmModal(taskId) {
-      modal = document.getElementById('main_modal_content');
+    function renderConfirmModal(modalPropoties) {
+      modal = document.getElementById('confirm_modal_content');
       modal.innerHTML = "";
+
+      if (!modalPropoties) modalPropoties = {};
 
       modal.innerHTML = `
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="confirmDeleteLabel">Confirm Deletion</h5>
+            <h5 class="modal-title" id="confirmDeleteLabel">${modalPropoties.head? modalPropoties.head : 'Confirm'}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            Are you sure you want to delete this item?
+            ${modalPropoties.body? modalPropoties.body : 'Are you sure you want to delete this item?'}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-            <button type="button" class="btn btn-danger" id="confirmDeleteButton">Yes, Delete</button>
+            <button type="button" class="btn btn-danger" id="confirmButton">${modalPropoties.confirm? modalPropoties.confirm : 'Yes, Confirm'} </button>
           </div>
         </div>
       `
     }
-
-    async function deleteTask(taskId) {
-      try {
-        const response = await fetch(`/todos/deletetask`, {
-          method: 'POST', // Change to POST
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            taskId: taskId,
-          }), // Send the updated status
-        });
-        if (response.ok) {
-          closeModal();
-          loadTasksByDate();
-        } else {
-          throw new Error('Failed to delete task');
-
-          const result = await response.json();
-          console.log(result.isDone); // Success message from the server
-          console.log(result.message); // Success message from the server
-        }
-      } catch {
-        console.error('Error updating task status:', error);
-      }
-    }
-
-    // Load tasks when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      loadTasksByDate();
-      initializeModal();
-    });
   </script>
 
 </body>
